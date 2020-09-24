@@ -1,0 +1,72 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="my-styles.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Sip demo</title>
+</head>
+
+<body>
+
+    <h1>SIP Testing</h1>
+
+    <head><title>WebRT</title>
+        <style>
+          video { height: 240px; width: 320px; border: 3px solid grey; }
+        </style>
+      </head>
+      
+    <video id="peer-video"></video>
+    <video id="my-video" autoplay muted = true></video>
+    <p id = "status"> Status: </p>
+    <button onclick="start_video()">start</button>
+
+    <script src="jssip.js"></script>
+
+    <script>
+    
+    var socket = new JsSIP.WebSocketInterface('wss://134.122.92.167:5060');
+    socket.via_transport = "tcp"; // may change later
+
+        var configuration = {
+            sockets : [socket],
+            outbound_proxy_set:   'sip:134.122.92.167:5060',
+            uri:                  'sip:00@134.122.92.167:5060',
+            password:             '12QW#$er00',
+            authorization_user:   'Uxzj5O0KZo'
+        };
+
+        var status = document.getElementById('my-video');
+
+        var coolPhone = new JsSIP.UA(configuration);
+
+        coolPhone.start();
+
+        // Make an audio/video call:
+
+        var useAudio = true;
+        var useVideo = true;
+
+        var views = {
+        'selfView':   document.getElementById('my-video'),
+        'remoteView': document.getElementById('peer-video')
+        };
+
+        var eventHandlers = {
+        'connecting': function(e){ status.innerHTML = 'connecting' },
+        'progress':   function(e){ status.innerHTML = 'in progress'  },
+        'failed':     function(e){ status.innerHTML = 'failed' },
+        'started':    function(e){ status.innerHTML = 'started' },
+        'ended':      function(e){ status.innerHTML = 'ended' }
+        };
+
+        function start_video() {
+            coolPhone.call('sip:01@134.122.92.167:5060', useAudio, useVideo, eventHandlers, views);
+        }
+        
+    </script>
+
+</body>
+</html>
